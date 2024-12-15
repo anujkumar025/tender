@@ -1,10 +1,9 @@
 import './App.css'
 import Login from './pages/Login'
 import Home from './pages/Home'
-// import TenderProposalEvaluator from './pages/temp'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import CheckEligibility from './pages/CheckEligibility'
-// import SelectBest from './pages/SelectBest'
+import SelectBest from './pages/SelectBest'
 
 function App() {
   return (
@@ -13,8 +12,7 @@ function App() {
         <Route path='/' element={<Home />}/>
         <Route path='/login' element={<Login />}/>
         <Route path='/checkeligibility' element={<CheckEligibility />}/>
-        {/* <Route path='/selectbest' element={<SelectBest />}/> */}
-        {/* <Route path='/selectbest' element={<TenderProposalEvaluator />}/> */}
+        <Route path='/selectbest' element={<SelectBest />}/>
       </Routes>
     </Router>
   )

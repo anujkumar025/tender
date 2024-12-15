@@ -3,7 +3,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
-// import { checkProposalComplianceFromPDFs } from './complianceChecker'
+import { checkProposalComplianceFromPDFs } from './complianceChecker'
 import { Button } from '@/components/ui/button'
 
 
@@ -11,12 +11,12 @@ function SelectBest() {
     const [tenderFiles, setTenderFiles] = useState([]);
     const [proposalFiles, setProposalFiles] = useState([]);
     // const [good, setGood] = useState([]);
-    // const [result, setResult] = useState(null);
+    const [result, setResult] = useState(null);
 
-    useEffect(() => {
-        console.log(tenderFiles)
-        console.log(proposalFiles)
-    }, [tenderFiles, proposalFiles])
+    // useEffect(() => {
+    //     console.log(tenderFiles)
+    //     console.log(proposalFiles)
+    // }, [tenderFiles, proposalFiles])
 
     const handleFileChange = (event, inputType) => {
         try {
@@ -42,19 +42,16 @@ function SelectBest() {
         setProposalFiles((prevFiles) => prevFiles.filter((_, index) => index !== indexToDelete));
     };
 
-    // async function handleSubmit(){
-    //     try {
-    //         // Provide your PDF files as arguments (e.g., via file input or predefined file paths)
-    //         const tenderFile = "path/to/tender.pdf"; // Replace with actual file input or path
-    //         const proposalFile = "path/to/proposal.pdf"; // Replace with actual file input or path
-      
-    //         const complianceResult = await checkProposalComplianceFromPDFs(tenderFile, proposalFile);
-    //         setResult(complianceResult); // Store the result in the state
-    //         console.log(complianceResult);
-    //       } catch (error) {
-    //         console.error("Error checking compliance:", error);
-    //       }
-    // }
+    async function handleSubmit(){
+        try {      
+            const complianceResult = await checkProposalComplianceFromPDFs(tenderFiles[0], proposalFiles[0]);
+            setResult(complianceResult); // Store the result in the state
+            console.log("complianceResult") ;
+            console.log(complianceResult);
+          } catch (error) {
+            console.error("Error checking compliance:", error);
+        }
+    }
 
 
     return (
@@ -105,8 +102,8 @@ function SelectBest() {
                         </div>
                         </ScrollArea>
                     )}
-                    <Button>Submit</Button>
-                    {/* <Button onClick={handleSubmit}>Submit</Button> */}
+                    {/* <Button>Submit</Button> */}
+                    <Button onClick={handleSubmit}>Submit</Button>
                 </div>
             </div>
         </div>

@@ -1,11 +1,13 @@
 import * as pdfjsLib from "pdfjs-dist/webpack";
 
+// Worker Script
 const workerScript = `
   importScripts('https://unpkg.com/compromise');
 
   self.onmessage = async function(event) {
     const { tenderText, proposalText } = event.data;
 
+    // Function to extract sections from the tender text
     const extractSections = (text) => {
       const doc = nlp(text);
       const sections = {};
@@ -31,6 +33,7 @@ const workerScript = `
       return sections;
     };
 
+    // Function to extract conditions from a section of text
     const extractConditions = (sectionText) => {
       const doc = nlp(sectionText);
       const sentences = doc.sentences().out('array');
@@ -41,31 +44,36 @@ const workerScript = `
         .map(sentence => sentence.trim().toLowerCase());
     };
 
+    // Function to extract claims from the proposal text
     const extractProposalClaims = (text) => {
       const doc = nlp(text);
       return new Set(doc.sentences().out('array').map(sentence => sentence.trim().toLowerCase()));
     };
 
+    // Extract sections and claims
     const tenderSections = extractSections(tenderText);
     const proposalClaims = extractProposalClaims(proposalText);
     const unsatisfiedConditions = [];
 
+    // Check each section for unmet conditions
     for (const [sectionName, sectionText] of Object.entries(tenderSections)) {
       const conditions = extractConditions(sectionText);
       conditions.forEach(condition => {
         const isSatisfied = Array.from(proposalClaims).some(claim => claim.includes(condition));
         if (!isSatisfied) {
-          unsatisfiedConditions.push(Section: ${sectionName}, Condition: "${condition}");
+          unsatisfiedConditions.push({Section: sectionName, Condition: condition});
         }
       });
     }
 
+    // Send the result back based on whether conditions are satisfied or not
     if (unsatisfiedConditions.length === 0) {
       self.postMessage("All conditions are satisfied.");
     } else {
       self.postMessage(
-        "Some conditions are not satisfied:\n\n" +
-        unsatisfiedConditions.join("\n")
+        \`Some conditions are not satisfied:
+
+\${unsatisfiedConditions.join("\\n")}\`
       );
     }
   };
@@ -77,7 +85,10 @@ const worker = new Worker(URL.createObjectURL(workerBlob));
 
 // Helper: Extract text from PDF using pdfjsLib
 async function extractTextFromPDF(pdfFile) {
-  const pdf = await pdfjsLib.getDocument(pdfFile).promise;
+  // Ensure pdfFile is a Blob or URL (if it's a file from an input, read it as an ArrayBuffer)
+  const fileUrl = pdfFile instanceof Blob ? URL.createObjectURL(pdfFile) : pdfFile;
+
+  const pdf = await pdfjsLib.getDocument({ url: fileUrl }).promise;
   let text = "";
 
   for (let i = 1; i <= pdf.numPages; i++) {
